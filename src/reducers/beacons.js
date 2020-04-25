@@ -2,6 +2,7 @@ import {
   SET_SCANNING_STATE,
   ADD_EDDYSTONE,
   REMOVE_EDDYSTONE,
+  UPDATE_EDDYSTONES,
 } from '../constants';
 
 const initialState = {
@@ -15,7 +16,10 @@ export default (state = initialState, action) => {
     case SET_SCANNING_STATE:
       return {...state, scanning: payload};
     case ADD_EDDYSTONE:
-      return {...state, eddystones: state.eddystones.concat(payload)};
+      const tempArray = state.eddystones.filter(
+        eddy => eddy.instanceId !== payload.instanceId,
+      );
+      return {...state, eddystones: tempArray.concat(payload)};
     case REMOVE_EDDYSTONE:
       return {
         ...state,
@@ -23,7 +27,8 @@ export default (state = initialState, action) => {
           eddystone => eddystone.instanceId !== payload,
         ),
       };
-
+    case UPDATE_EDDYSTONES:
+      return {...state, eddystones: payload};
     default:
       return state;
   }

@@ -12,7 +12,7 @@ import {connect as connectToStore} from 'react-redux';
 import {request, PERMISSIONS} from 'react-native-permissions';
 import Kontakt from 'react-native-kontaktio';
 
-import {addEddystone} from './actions/beacons';
+import {addEddystone, updateEddystones} from './actions/beacons';
 
 const {
   connect,
@@ -65,7 +65,9 @@ export class App extends Component {
           console.log('Brak uprawnień!');
           break;
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log('error locationPermissionRequest', error);
+    }
   };
 
   connectBeacon = async () => {
@@ -86,12 +88,26 @@ export class App extends Component {
       DeviceEventEmitter.addListener(
         'eddystoneDidAppear',
         ({eddystone, namespace}) => {
-          console.log('!!!Dodano beacon!!!', eddystone.instanceId);
+          console.log('!!!Dodano beacon!!!', eddystone);
           this.props.addEddystone(eddystone);
         },
       );
+
+      DeviceEventEmitter.addListener(
+        'eddystonesDidUpdate',
+        ({eddystones, namespace}) => {
+          // eddystones.forEach(eddystone => {
+          //   console.log('!!!Aktualizacja!!!', eddystone.instanceId);
+          // });
+          console.log('!!!Aktualizacja!!!', eddystones);
+          // for (let index = 0; index < eddystones.length; index++) {
+          //   console.log('!!!Aktualizacja!!!', eddystones[index].instanceId);
+          // }
+          this.props.updateEddystones(eddystones);
+        },
+      );
     } catch (error) {
-      console.log('error', error);
+      console.log('error connectBeacon', error);
     }
   };
 
@@ -114,7 +130,14 @@ export class App extends Component {
         <Button title="Stop scanning" onPress={() => stopScanning()} />
         <FlatList
           data={eddystones}
-          renderItem={({item}) => <Text>{item.instanceId}</Text>}
+          renderItem={({item, index}) => {
+            return (
+              <View key={index}>
+                <Text>{item.instanceId}</Text>
+                <Text>{item.accuracy}</Text>
+              </View>
+            );
+          }}
         />
       </View>
     );
@@ -126,9 +149,8 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  addEddystone: eddystone => {
-    dispatch(addEddystone(eddystone));
-  },
+  addEddystone: eddystone => dispatch(addEddystone(eddystone)),
+  updateEddystones: eddystones => dispatch(updateEddystones(eddystones)),
 });
 
 export default connectToStore(mapStateToProps, mapDispatchToProps)(App);
