@@ -1,7 +1,7 @@
 import {
   SET_SCANNING_STATE,
   ADD_EDDYSTONE,
-  REMOVE_EDDYSTONE,
+  DELETE_EDDYSTONE,
   UPDATE_EDDYSTONES,
 } from '../constants';
 
@@ -20,7 +20,7 @@ export default (state = initialState, action) => {
         eddy => eddy.instanceId !== payload.instanceId,
       );
       return {...state, eddystones: tempArray.concat(payload)};
-    case REMOVE_EDDYSTONE:
+    case DELETE_EDDYSTONE:
       return {
         ...state,
         eddystones: state.eddystones.filter(

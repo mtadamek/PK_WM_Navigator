@@ -12,7 +12,11 @@ import {connect as connectToStore} from 'react-redux';
 import {request, PERMISSIONS} from 'react-native-permissions';
 import Kontakt from 'react-native-kontaktio';
 
-import {addEddystone, updateEddystones} from './actions/beacons';
+import {
+  addEddystone,
+  deleteEddystones,
+  updateEddystones,
+} from './actions/beacons';
 
 const {
   connect,
@@ -72,10 +76,7 @@ export class App extends Component {
 
   connectBeacon = async () => {
     try {
-      await connect(
-        '',
-        [EDDYSTONE],
-      );
+      await connect('', [EDDYSTONE]);
       await configure({
         scanMode: scanMode.LOW_LATENCY,
         scanPeriod: scanPeriod.RANGING,
@@ -90,6 +91,14 @@ export class App extends Component {
         ({eddystone, namespace}) => {
           console.log('!!!Dodano beacon!!!', eddystone);
           this.props.addEddystone(eddystone);
+        },
+      );
+
+      DeviceEventEmitter.addListener(
+        'eddystoneDidDisappear',
+        ({eddystone, namespace}) => {
+          console.log('!!!eddystoneDidDisappear!!!', eddystone);
+          this.props.deleteEddystones(eddystone.instanceId);
         },
       );
 
@@ -148,13 +157,14 @@ export class App extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   eddystones: state.beacons.eddystones,
 });
 
-const mapDispatchToProps = dispatch => ({
-  addEddystone: eddystone => dispatch(addEddystone(eddystone)),
-  updateEddystones: eddystones => dispatch(updateEddystones(eddystones)),
+const mapDispatchToProps = (dispatch) => ({
+  addEddystone: (eddystone) => dispatch(addEddystone(eddystone)),
+  deleteEddystones: (id) => dispatch(deleteEddystones(id)),
+  updateEddystones: (eddystones) => dispatch(updateEddystones(eddystones)),
 });
 
 export default connectToStore(mapStateToProps, mapDispatchToProps)(App);
