@@ -111,7 +111,7 @@ export class App extends Component {
     }
   };
 
-  async componentDidMount() {
+  componentDidMount() {
     this.locationPermissionRequest();
   }
 
@@ -125,19 +125,23 @@ export class App extends Component {
 
     return (
       <View>
-        <Text>PK WM Navigator</Text>
         <Button title="Start scanning" onPress={() => startScanning()} />
         <Button title="Stop scanning" onPress={() => stopScanning()} />
+        {/* <Button
+          title="Detail"
+          onPress={() => this.props.navigation.navigate('Detail')}
+        /> */}
         <FlatList
           data={eddystones}
           renderItem={({item, index}) => {
             return (
-              <View key={index}>
-                <Text>{item.instanceId}</Text>
-                <Text>{item.accuracy}</Text>
+              <View>
+                <Text>Beacon ID: {item.instanceId}</Text>
+                <Text>Odległość: {item.accuracy.toFixed(1)}m</Text>
               </View>
             );
           }}
+          keyExtractor={(item, index) => index.toString()}
         />
       </View>
     );
