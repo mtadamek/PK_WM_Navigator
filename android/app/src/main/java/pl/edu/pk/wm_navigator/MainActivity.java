@@ -1,4 +1,4 @@
-package com.pk_wm_navigator;
+package pl.edu.pk.wm_navigator;
 
 import com.facebook.react.ReactActivity;
 
