@@ -105,13 +105,9 @@ export class App extends Component {
       DeviceEventEmitter.addListener(
         'eddystonesDidUpdate',
         ({eddystones, namespace}) => {
-          // eddystones.forEach(eddystone => {
-          //   console.log('!!!Aktualizacja!!!', eddystone.instanceId);
-          // });
-          console.log('!!!Aktualizacja!!!', eddystones);
-          // for (let index = 0; index < eddystones.length; index++) {
-          //   console.log('!!!Aktualizacja!!!', eddystones[index].instanceId);
-          // }
+          eddystones.forEach(eddystone => {
+            console.log('!!!Aktualizacja!!!', eddystone.instanceId);
+          });
           this.props.updateEddystones(eddystones);
         },
       );
