@@ -1,4 +1,5 @@
 import 'react-native-gesture-handler';
+import {gestureHandlerRootHOC} from 'react-native-gesture-handler';
 import React from 'react';
 import {Provider} from 'react-redux';
 import {NavigationContainer} from '@react-navigation/native';
@@ -15,10 +16,10 @@ const Init = () => (
       <Navigator initialRouteName="Home">
         <Screen
           name="Home"
-          component={App}
-          options={{title: 'PK WM Navigator'}}
+          component={gestureHandlerRootHOC(App)}
+          options={{headerShown: false}}
         />
-        <Screen name="Detail" component={Detail} />
+        <Screen name="Detail" component={gestureHandlerRootHOC(Detail)} />
       </Navigator>
     </NavigationContainer>
   </Provider>
