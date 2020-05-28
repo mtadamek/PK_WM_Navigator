@@ -1,30 +1,23 @@
 import React, {Component} from 'react';
 import {
-  Text,
   View,
   Alert,
   BackHandler,
   DeviceEventEmitter,
-  Button,
-  FlatList,
-  ImageBackground,
   StyleSheet,
-  Animated,
+  Dimensions,
+  Image,
 } from 'react-native';
 import {connect as connectToStore} from 'react-redux';
 import {request, PERMISSIONS} from 'react-native-permissions';
 import Kontakt from 'react-native-kontaktio';
+import ImageZoom from 'react-native-image-pan-zoom';
 
 import {
   addEddystone,
   deleteEddystones,
   updateEddystones,
 } from './actions/beacons';
-import {
-  PinchGestureHandler,
-  State,
-  PanGestureHandler,
-} from 'react-native-gesture-handler';
 
 const {
   connect,
@@ -41,6 +34,10 @@ const {
   forceScanConfiguration,
   monitoringEnabled,
 } = Kontakt;
+
+const Window = Dimensions.get('window');
+const WIDTH = Window.width;
+const HEIGHT = Window.height;
 
 export class App extends Component {
   locationPermissionDeniedAlert = () => {
@@ -127,62 +124,6 @@ export class App extends Component {
     }
   };
 
-  translationX = new Animated.Value(0);
-  lastTransX = 0;
-
-  translationY = new Animated.Value(0);
-  lastTransY = 0;
-
-  baseScale = new Animated.Value(1);
-  pinchScale = new Animated.Value(1);
-  scale = Animated.multiply(this.baseScale, this.pinchScale);
-  lastScale = 1;
-
-  onPanEvent = Animated.event(
-    [
-      {
-        nativeEvent: {
-          translationX: this.translationX,
-          translationY: this.translationY,
-        },
-      },
-    ],
-    {
-      useNativeDriver: true,
-    },
-  );
-
-  onPanStateChange = event => {
-    if (event.nativeEvent.oldState === State.ACTIVE) {
-      this.lastTransX += event.nativeEvent.translationX;
-      this.translationX.setOffset(this.lastTransX);
-      this.translationX.setValue(0);
-
-      this.lastTransY += event.nativeEvent.translationY;
-      this.translationY.setOffset(this.lastTransY);
-      this.translationY.setValue(0);
-    }
-  };
-
-  onPinchEvent = Animated.event(
-    [
-      {
-        nativeEvent: {scale: this.pinchScale},
-      },
-    ],
-    {
-      useNativeDriver: true,
-    },
-  );
-
-  onPinchStateChange = event => {
-    if (event.nativeEvent.oldState === State.ACTIVE) {
-      this.lastScale *= event.nativeEvent.scale;
-      this.baseScale.setValue(this.lastScale);
-      this.pinchScale.setValue(1);
-    }
-  };
-
   componentDidMount() {
     this.locationPermissionRequest();
   }
@@ -196,33 +137,22 @@ export class App extends Component {
     const {eddystones} = this.props;
 
     return (
-      //style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-      <PanGestureHandler
-        onGestureEvent={this.onPanEvent}
-        onHandlerStateChange={this.onPanStateChange}
-        minDist={10}
-        minPointers={1}
-        maxPointers={1}>
-        <Animated.View>
-          <PinchGestureHandler
-            onGestureEvent={this.onPinchEvent}
-            onHandlerStateChange={this.onPinchStateChange}>
-            <Animated.Image
-              source={require('./assets/images/kampus.jpg')}
-              style={[
-                {
-                  transform: [
-                    {perspective: 200},
-                    {scale: this.scale},
-                    {translateX: this.translationX},
-                    {translateY: this.translationY},
-                  ],
-                },
-              ]}
-            />
-          </PinchGestureHandler>
-        </Animated.View>
-      </PanGestureHandler>
+      <View style={{flex: 1}}>
+        <ImageZoom
+          ref={ref => (this.ImageZoomRef = ref)}
+          cropWidth={WIDTH}
+          cropHeight={HEIGHT}
+          imageWidth={WIDTH}
+          imageHeight={WIDTH}
+          maxScale={2.5}
+          minScale={1}>
+          <Image
+            style={{width: WIDTH, height: WIDTH}}
+            source={require('./assets/images/kampus.jpg')}
+          />
+        </ImageZoom>
+      </View>
+      //</View>
       // {/* <Button
       //     title="Detail"
       //     onPress={() => this.props.navigation.navigate('Detail')}
