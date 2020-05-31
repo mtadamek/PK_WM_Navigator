@@ -137,18 +137,23 @@ export class App extends Component {
   }
 
   componentWillUnmount() {
+    console.log('unmount');
+
     // disconnect();
     // DeviceEventEmitter.removeAllListeners();
   }
 
+  onSearchPress = () => {
+    console.log('search');
+    this.props.navigation.navigate('Search');
+  };
+
   render() {
-    const {eddystones} = this.props;
-    console.log(HEIGHT, WIDTH);
-    console.log(this.header);
+    const {eddystones, navigation} = this.props;
 
     return (
       <Container>
-        <Header searchBar rounded>
+        {/* <Header searchBar rounded>
           <Item>
             <Icon name="search" />
             <Input placeholder="Search" />
@@ -157,14 +162,31 @@ export class App extends Component {
           <Button transparent>
             <Text>Search</Text>
           </Button>
-        </Header>
-        <Content style={{backgroundColor: 'yellow'}}>
+        </Header> */}
+        <Button
+          rounded
+          iconLeft
+          block
+          style={{
+            left: 20,
+            right: 20,
+            top: 10,
+            position: 'absolute',
+            zIndex: 1,
+            opacity: 0.9,
+          }}
+          onPress={this.onSearchPress}>
+          <Icon name="search" />
+          <Text>Szukaj</Text>
+        </Button>
+        <Content>
           <ImageZoom
             ref={(ref) => (this.ImageZoomRef = ref)}
             cropWidth={WIDTH}
-            cropHeight={HEIGHT * 0.8}
+            cropHeight={HEIGHT * 0.9}
             imageWidth={WIDTH}
             imageHeight={WIDTH}
+            enableSwipeDown={false}
             maxScale={2.5}
             minScale={1}>
             <Image
