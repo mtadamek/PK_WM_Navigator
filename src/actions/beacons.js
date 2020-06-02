@@ -1,4 +1,4 @@
-import {ADD_EDDYSTONE, UPDATE_EDDYSTONES, DELETE_EDDYSTONE} from '../constants';
+import {ADD_EDDYSTONE, UPDATE_EDDYSTONES, DELETE_EDDYSTONE} from '../constants/Actions';
 
 export const addEddystone = (eddystone) => ({
   type: ADD_EDDYSTONE,

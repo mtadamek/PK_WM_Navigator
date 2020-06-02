@@ -17,6 +17,7 @@ import {
   InputGroup,
   Item,
 } from 'native-base';
+import Colors from '../constants/Colors';
 
 class Search extends React.Component {
   componentDidMount() {}
@@ -24,7 +25,7 @@ class Search extends React.Component {
     console.log(this.searchInput);
     return (
       <Container>
-        <Header>
+        <Header style={{backgroundColor: Colors.primary}}>
           <Left>
             <Button transparent onPress={() => this.props.navigation.goBack()}>
               <Icon name="arrow-back" />
@@ -32,7 +33,7 @@ class Search extends React.Component {
           </Left>
           <Body>
             <Input
-              getRef={(input) => {
+              getRef={input => {
                 this.searchInput = input;
               }}
               placeholder="Szukaj"

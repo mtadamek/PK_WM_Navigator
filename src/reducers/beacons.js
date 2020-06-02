@@ -3,7 +3,7 @@ import {
   ADD_EDDYSTONE,
   DELETE_EDDYSTONE,
   UPDATE_EDDYSTONES,
-} from '../constants';
+} from '../constants/Actions';
 
 const initialState = {
   scanning: false,

@@ -10,6 +10,7 @@ import store from './store';
 import App from './App';
 import Search from './screens/Search';
 import Detail from './screens/Detail';
+import Colors from './constants/Colors';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -37,8 +38,9 @@ const Init = () => (
       <Tab.Navigator
         initialRouteName="Map"
         screenOptions={({route}) => ({
-          tabBarIcon: ({focused, color, size}) => {
+          tabBarIcon: ({focused, size}) => {
             let iconName;
+            const color = focused ? Colors.primary : Colors.secondary;
 
             if (route.name === 'Map') {
               iconName = 'map';
@@ -46,11 +48,12 @@ const Init = () => (
               iconName = 'list';
             }
 
-            return <Icon name={iconName} size={size} color={color} />;
+            return <Icon name={iconName} size={size} style={{color}} />;
           },
         })}
         tabBarOptions={{
-          activeTintColor: 'blue',
+          activeTintColor: Colors.primary,
+          inactiveTintColor: Colors.secondary,
           keyboardHidesTabBar: true,
         }}>
         <Tab.Screen name="Map" component={Map} />

@@ -1,4 +1,4 @@
-import {SET_SCALE} from '../constants';
+import {SET_SCALE} from '../constants/Actions';
 import {Animated} from 'react-native';
 
 const initialState = {

@@ -24,11 +24,13 @@ import {request, PERMISSIONS} from 'react-native-permissions';
 import Kontakt from 'react-native-kontaktio';
 import ImageZoom from 'react-native-image-pan-zoom';
 import Modal from 'react-native-modal';
+import SplashScreen from 'react-native-splash-screen';
 import {
   addEddystone,
   deleteEddystones,
   updateEddystones,
 } from './actions/beacons';
+import Colors from './constants/Colors';
 
 const {
   connect,
@@ -92,7 +94,10 @@ export class App extends Component {
 
   connectBeacon = async () => {
     try {
-      await connect('', [EDDYSTONE]);
+      await connect(
+        '',
+        [EDDYSTONE],
+      );
       await configure({
         scanMode: scanMode.LOW_LATENCY,
         scanPeriod: scanPeriod.RANGING,
@@ -121,7 +126,7 @@ export class App extends Component {
       DeviceEventEmitter.addListener(
         'eddystonesDidUpdate',
         ({eddystones, namespace}) => {
-          eddystones.forEach((eddystone) => {
+          eddystones.forEach(eddystone => {
             console.log('!!!Aktualizacja!!!', eddystone.instanceId);
           });
           this.props.updateEddystones(eddystones);
@@ -133,6 +138,7 @@ export class App extends Component {
   };
 
   componentDidMount() {
+    SplashScreen.hide();
     //this.locationPermissionRequest();
   }
 
@@ -146,6 +152,7 @@ export class App extends Component {
   onSearchPress = () => {
     console.log('search');
     this.props.navigation.navigate('Search');
+    //this.ImageZoomRef.centerOn({x: 140, y: 70, scale: 2.5, duration: 1000});
   };
 
   render() {
@@ -170,23 +177,25 @@ export class App extends Component {
           style={{
             left: 20,
             right: 20,
-            top: 10,
+            top: 15,
             position: 'absolute',
             zIndex: 1,
             opacity: 0.9,
+            backgroundColor: Colors.primary,
           }}
           onPress={this.onSearchPress}>
           <Icon name="search" />
           <Text>Szukaj</Text>
         </Button>
-        <Content>
+        <Content style={{backgroundColor:'#eee'}}>
           <ImageZoom
-            ref={(ref) => (this.ImageZoomRef = ref)}
+            ref={ref => (this.ImageZoomRef = ref)}
             cropWidth={WIDTH}
             cropHeight={HEIGHT * 0.9}
             imageWidth={WIDTH}
             imageHeight={WIDTH}
             enableSwipeDown={false}
+            doubleClickInterval={300}
             maxScale={2.5}
             minScale={1}>
             <Image
@@ -281,14 +290,14 @@ const styles = StyleSheet.create({
   },
 });
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = state => ({
   eddystones: state.beacons.eddystones,
 });
 
-const mapDispatchToProps = (dispatch) => ({
-  addEddystone: (eddystone) => dispatch(addEddystone(eddystone)),
-  deleteEddystones: (id) => dispatch(deleteEddystones(id)),
-  updateEddystones: (eddystones) => dispatch(updateEddystones(eddystones)),
+const mapDispatchToProps = dispatch => ({
+  addEddystone: eddystone => dispatch(addEddystone(eddystone)),
+  deleteEddystones: id => dispatch(deleteEddystones(id)),
+  updateEddystones: eddystones => dispatch(updateEddystones(eddystones)),
 });
 
 export default connectToStore(mapStateToProps, mapDispatchToProps)(App);
