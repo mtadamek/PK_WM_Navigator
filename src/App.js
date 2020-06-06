@@ -7,17 +7,19 @@ import {
   StyleSheet,
   Dimensions,
   Image,
-  TouchableOpacity,
+  Linking,
 } from 'react-native';
 import {
   Container,
-  Header,
-  Item,
-  Input,
   Icon,
   Button,
   Text,
+  H3,
   Content,
+  Grid,
+  Row,
+  Col,
+  Thumbnail,
 } from 'native-base';
 import {connect as connectToStore} from 'react-redux';
 import {request, PERMISSIONS} from 'react-native-permissions';
@@ -25,11 +27,15 @@ import Kontakt from 'react-native-kontaktio';
 import ImageZoom from 'react-native-image-pan-zoom';
 import Modal from 'react-native-modal';
 import SplashScreen from 'react-native-splash-screen';
+
+import BottomSheet from './components/BottomSheet';
 import {
   addEddystone,
   deleteEddystones,
   updateEddystones,
 } from './actions/beacons';
+import {setInstituteToShow} from './actions/search';
+import getBuildingCoordinates from './utils/getBuildingCoordinates';
 import Colors from './constants/Colors';
 
 const {
@@ -142,34 +148,32 @@ export class App extends Component {
     //this.locationPermissionRequest();
   }
 
-  componentWillUnmount() {
-    console.log('unmount');
+  componentDidUpdate() {
+    if (this.props.instituteToShow && this.bottomSheet && this.imageZoomRef) {
+      this.showBottomInfo();
+    }
+  }
 
+  componentWillUnmount() {
     // disconnect();
     // DeviceEventEmitter.removeAllListeners();
   }
 
   onSearchPress = () => {
-    console.log('search');
     this.props.navigation.navigate('Search');
-    //this.ImageZoomRef.centerOn({x: 140, y: 70, scale: 2.5, duration: 1000});
+  };
+
+  showBottomInfo = () => {
+    const {instituteToShow} = this.props;
+    const buldingName = instituteToShow.office.split('')[0].toLowerCase();
+    this.bottomSheet.snapTo(1);
+    this.imageZoomRef.centerOn(getBuildingCoordinates[buldingName]);
   };
 
   render() {
-    const {eddystones, navigation} = this.props;
-
+    const {eddystones} = this.props;
     return (
       <Container>
-        {/* <Header searchBar rounded>
-          <Item>
-            <Icon name="search" />
-            <Input placeholder="Search" />
-            <Icon name="people" />
-          </Item>
-          <Button transparent>
-            <Text>Search</Text>
-          </Button>
-        </Header> */}
         <Button
           rounded
           iconLeft
@@ -177,7 +181,7 @@ export class App extends Component {
           style={{
             left: 20,
             right: 20,
-            top: 15,
+            top: 20,
             position: 'absolute',
             zIndex: 1,
             opacity: 0.9,
@@ -187,16 +191,35 @@ export class App extends Component {
           <Icon name="search" />
           <Text>Szukaj</Text>
         </Button>
-        <Content style={{backgroundColor:'#eee'}}>
+        <BottomSheet
+          getRef={r => (this.bottomSheet = r)}
+          instituteToShow={this.props.instituteToShow}
+          onClose={() => {
+            this.props.setInstituteToShow(null);
+            this.imageZoomRef.centerOn({x: 0, y: 0, scale: 1, duration: 200});
+          }}
+        />
+        {/* <BottomSheet
+          ref={r => (this.bottomSheet = r)}
+          snapPoints={[HEIGHT * 0.6, HEIGHT * 0.27, 0]}
+          initialSnap={2}
+          renderContent={this.renderContent}
+          borderRadius={10}
+          onCloseEnd={() => {
+            this.props.setInstituteToShow(null);
+            this.imageZoomRef.centerOn({x: 0, y: 0, scale: 1, duration: 200});
+          }}
+        /> */}
+        <Content style={{backgroundColor: '#eee'}}>
           <ImageZoom
-            ref={ref => (this.ImageZoomRef = ref)}
+            ref={ref => (this.imageZoomRef = ref)}
             cropWidth={WIDTH}
-            cropHeight={HEIGHT * 0.9}
+            cropHeight={HEIGHT * 0.95}
             imageWidth={WIDTH}
             imageHeight={WIDTH}
             enableSwipeDown={false}
             doubleClickInterval={300}
-            maxScale={2.5}
+            maxScale={3}
             minScale={1}>
             <Image
               style={{width: WIDTH, height: WIDTH}}
@@ -225,11 +248,6 @@ export class App extends Component {
             }}
           /> */}
           </ImageZoom>
-          <Modal isVisible={false}>
-            <View style={{flex: 1, backgroundColor: 'white'}}>
-              <Text>I am the modal content!</Text>
-            </View>
-          </Modal>
         </Content>
       </Container>
       //</View>
@@ -292,12 +310,14 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state => ({
   eddystones: state.beacons.eddystones,
+  instituteToShow: state.search.instituteToShow,
 });
 
 const mapDispatchToProps = dispatch => ({
   addEddystone: eddystone => dispatch(addEddystone(eddystone)),
   deleteEddystones: id => dispatch(deleteEddystones(id)),
   updateEddystones: eddystones => dispatch(updateEddystones(eddystones)),
+  setInstituteToShow: id => dispatch(setInstituteToShow(id)),
 });
 
 export default connectToStore(mapStateToProps, mapDispatchToProps)(App);
