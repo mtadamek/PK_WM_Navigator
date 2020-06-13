@@ -34,7 +34,7 @@ import {
 import SearchBar from '../components/SearchBar';
 import QueryIsEmpty from '../components/QueryIsEmpty';
 import QueryIsNotEmpty from '../components/QueryIsNotEmpty';
-import {getCategories, setSearchQuery} from '../actions/search';
+import {setObjectToShow, setSearchQuery} from '../actions/search';
 
 class Search extends React.Component {
   componentDidMount() {
@@ -45,11 +45,31 @@ class Search extends React.Component {
 
   goBack = () => this.props.navigation.goBack();
 
-  navigateTo = screen => this.props.navigation.navigate(screen);
+  navigateTo = (screen, params) =>
+    this.props.navigation.navigate(screen, params);
+
+  // const {institutes, employees} = payload;
+  //   const instituteNames = institutes.map(i => i.name.toUpperCase());
+  //   const employeeNames = employees.map(
+  //     e =>
+  //       `${e.degree.toUpperCase()} ${e.forename.toUpperCase()} ${e.surname.toUpperCase()}`,
+  //   );
+  //   const names = instituteNames.concat(employeeNames);
 
   render() {
-    const {query, error} = this.props;
-    
+    const {query, error, institutes, employees} = this.props;
+    let dataToShow = [];
+    if (query) {
+      const all = institutes.concat(employees);
+      dataToShow = all.filter(item => {
+        const name = item.name
+          ? item.name.toUpperCase()
+          : `${item.degree.toUpperCase()} ${item.forename.toUpperCase()} ${item.surname.toUpperCase()}`;
+
+        return name.indexOf(query.toUpperCase()) > -1;
+      });
+    }
+
     return (
       <Container>
         <SearchBar
@@ -57,9 +77,16 @@ class Search extends React.Component {
           goBack={this.goBack}
         />
         {query === '' ? (
-          <QueryIsEmpty navigateTo={this.navigateTo} />
+          <QueryIsEmpty
+            navigateTo={this.navigateTo}
+            setObjectToShow={this.props.setObjectToShow}
+          />
         ) : (
-          <QueryIsNotEmpty />
+          <QueryIsNotEmpty
+            navigateTo={this.navigateTo}
+            setObjectToShow={this.props.setObjectToShow}
+            dataToShow={dataToShow}
+          />
         )}
       </Container>
     );
@@ -68,10 +95,13 @@ class Search extends React.Component {
 
 const mapStateToProps = state => ({
   query: state.search.query,
+  institutes: state.search.institutes,
+  employees: state.search.employees,
 });
 
 const mapDispatchToProps = dispatch => ({
   setSearchQuery: text => dispatch(setSearchQuery(text)),
+  setObjectToShow: obj => dispatch(setObjectToShow(obj)),
 });
 
 export default connect(

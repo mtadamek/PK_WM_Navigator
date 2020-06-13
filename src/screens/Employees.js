@@ -13,24 +13,32 @@ import {
   Image,
 } from 'native-base';
 import {connect} from 'react-redux';
-
-import {getInstitutesAndEmployees} from '../actions/search';
+import {getEmployees, setObjectToShow} from '../actions/search';
 import {SERVER_URL} from '../../config';
 
-export class QueryIsNotEmpty extends Component {
+export class Employees extends Component {
   componentDidMount() {
-    this.props.getInstitutesAndEmployees();
+    const {params} = this.props.route;
+    if (params && params.instituteId)
+      this.props.getEmployees(params.instituteId);
   }
 
   onRefresh = () => {
-    this.props.getInstitutesAndEmployees();
+    const {params} = this.props.route;
+    if (params && params.instituteId)
+      this.props.getEmployees(params.instituteId);
+  };
+
+  onPress = employee => {
+    this.props.setObjectToShow(employee);
+    this.props.navigation.navigate('Home');
   };
 
   render() {
-    const {dataToShow, loading} = this.props;
-    const searchThumbnailsList = dataToShow.map(item => (
+    const {loading, error, employees} = this.props;
+    const employeeThumbnailsList = employees.map(employee => (
       <ListItem
-        key={item._id}
+        key={employee._id}
         style={{
           marginRight: 10,
           marginLeft: 10,
@@ -44,13 +52,15 @@ export class QueryIsNotEmpty extends Component {
           justifyContent: 'flex-start',
         }}
         onPress={() => {
-          console.log(this.props);
-          this.props.setObjectToShow(item);
-          this.props.navigateTo('Home');
+          this.props.setObjectToShow(employee);
+          this.props.navigation.navigate('Home');
         }}>
-        <Thumbnail square source={{uri: SERVER_URL + 'files/' + item.image}} />
+        <Thumbnail
+          square
+          source={{uri: SERVER_URL + 'files/' + employee.image}}
+        />
         <Text style={{flex: 1, marginLeft: 15}}>
-          {item.name || `${item.degree} ${item.forename} ${item.surname}`}
+          {employee.degree} {employee.forename} {employee.surname}
         </Text>
       </ListItem>
     ));
@@ -60,7 +70,7 @@ export class QueryIsNotEmpty extends Component {
         refreshControl={
           <RefreshControl refreshing={loading} onRefresh={this.onRefresh} />
         }>
-        <List style={{backgroundColor: '#eee'}}>{searchThumbnailsList}</List>
+        <List style={{backgroundColor: '#eee'}}>{employeeThumbnailsList}</List>
       </ScrollView>
     );
   }
@@ -68,14 +78,16 @@ export class QueryIsNotEmpty extends Component {
 
 const mapStateToProps = state => ({
   loading: state.search.loading,
+  employees: state.search.employees,
   error: state.search.error,
 });
 
 const mapDispatchToProps = dispatch => ({
-  getInstitutesAndEmployees: () => dispatch(getInstitutesAndEmployees()),
+  getEmployees: instituteId => dispatch(getEmployees(instituteId)),
+  setObjectToShow: obj => dispatch(setObjectToShow(obj)),
 });
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps,
-)(QueryIsNotEmpty);
+)(Employees);

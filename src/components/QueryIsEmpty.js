@@ -16,51 +16,75 @@ import {
   Text,
   H3,
   Button,
+  ActionSheet,
 } from 'native-base';
-import {getCategories} from '../actions/search';
+import {getInstitutes} from '../actions/search';
 import mapCategoryName from '../utils/mapCategoryName';
 import Colors from '../constants/Colors';
-import {SERVER_URL} from '../../config'
+import {SERVER_URL} from '../../config';
+
+const BUTTONS = [
+  {text: 'Pokaż na mapie', icon: 'map', iconColor: '#ea943b'},
+  {text: 'Pracownicy', icon: 'people', iconColor: '#2c8ef4'},
+  {text: 'Cancel', icon: 'close', iconColor: '#fa213b'},
+];
+const CANCEL_INDEX = 2;
 
 class QueryIsEmpty extends Component {
   state = {modalVisible: false};
 
   componentDidMount() {
-    if (this.props.categories.length === 0) this.props.getCategories();
+    if (this.props.institutes.length === 0) this.props.getInstitutes();
   }
 
-  onRefresh = () => {
-    this.props.getCategories();
+  onRefresh = () => this.props.getInstitutes();
+
+  onActionSheetPress = (btnIndex, institute) => {
+    switch (btnIndex) {
+      case 0:
+        this.props.setObjectToShow(institute);
+        this.props.navigateTo('Home');
+        break;
+      case 1:
+        this.props.navigateTo('Employees', {instituteId: institute._id});
+        break;
+
+      default:
+        break;
+    }
   };
 
   render() {
-    const {loading, error, categories} = this.props;
-    console.log(JSON.stringify(error));
-    const categoryThumbnailsList = categories.map(c => (
+    const {loading, error, institutes} = this.props;
+    const instituteThumbnailsList = institutes.map(institute => (
       <ListItem
-        key={c._id}
+        key={institute._id}
         style={{
+          marginRight: 10,
+          marginLeft: 10,
+          marginTop: 5,
+          marginBottom: 5,
           paddingLeft: 10,
           borderRadius: 10,
-          marginRight: 10,
-          marginTop: 5,
-          marginLeft: 10,
-          marginBottom: 5,
           backgroundColor: 'white',
+          flex: 1,
+          alignItems: 'center',
+          justifyContent: 'flex-start',
         }}
-        onPress={() => this.props.navigateTo(mapCategoryName[c.name])}>
-        <Left>
-          <Thumbnail
-            large
-            source={{uri: SERVER_URL + 'files/' + c.image}}
-          />
-        </Left>
-        <Body style={{alignItems: 'flex-start', justifyContent: 'center'}}>
-          <H3>{c.name}</H3>
-        </Body>
-        <Right>
-          <Icon name="arrow-forward" />
-        </Right>
+        onPress={() =>
+          ActionSheet.show(
+            {
+              options: BUTTONS,
+              cancelButtonIndex: CANCEL_INDEX,
+            },
+            btnIndex => this.onActionSheetPress(btnIndex, institute),
+          )
+        }>
+        <Thumbnail
+          square
+          source={{uri: SERVER_URL + 'files/' + institute.image}}
+        />
+        <Text style={{flex: 1, marginLeft: 15}}>{institute.name}</Text>
       </ListItem>
     ));
 
@@ -75,11 +99,8 @@ class QueryIsEmpty extends Component {
                   onRefresh={this.onRefresh}
                 />
               }>
-              <List
-                style={{
-                  backgroundColor: '#eee',
-                }}>
-                {categoryThumbnailsList}
+              <List style={{backgroundColor: '#eee'}}>
+                {instituteThumbnailsList}
               </List>
             </ScrollView>
           </Col>
@@ -105,12 +126,12 @@ class QueryIsEmpty extends Component {
 
 const mapStateToProps = state => ({
   loading: state.search.loading,
-  categories: state.search.categories,
+  institutes: state.search.institutes,
   error: state.search.error,
 });
 
 const mapDispatchToProps = dispatch => ({
-  getCategories: () => dispatch(getCategories()),
+  getInstitutes: () => dispatch(getInstitutes()),
 });
 
 export default connect(

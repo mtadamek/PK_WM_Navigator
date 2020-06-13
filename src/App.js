@@ -6,8 +6,8 @@ import {
   DeviceEventEmitter,
   StyleSheet,
   Dimensions,
-  Image,
   Linking,
+  Image,
 } from 'react-native';
 import {
   Container,
@@ -20,6 +20,7 @@ import {
   Row,
   Col,
   Thumbnail,
+  Fab,
 } from 'native-base';
 import {connect as connectToStore} from 'react-redux';
 import {request, PERMISSIONS} from 'react-native-permissions';
@@ -34,7 +35,7 @@ import {
   deleteEddystones,
   updateEddystones,
 } from './actions/beacons';
-import {setInstituteToShow} from './actions/search';
+import {setObjectToShow} from './actions/search';
 import getBuildingCoordinates from './utils/getBuildingCoordinates';
 import Colors from './constants/Colors';
 
@@ -138,6 +139,8 @@ export class App extends Component {
           this.props.updateEddystones(eddystones);
         },
       );
+      //stopScanning();
+      //startScanning();
     } catch (error) {
       console.log('error connectBeacon', error);
     }
@@ -145,18 +148,18 @@ export class App extends Component {
 
   componentDidMount() {
     SplashScreen.hide();
-    //this.locationPermissionRequest();
+    this.locationPermissionRequest();
   }
 
   componentDidUpdate() {
-    if (this.props.instituteToShow && this.bottomSheet && this.imageZoomRef) {
+    if (this.props.objectToShow && this.bottomSheet && this.imageZoomRef) {
       this.showBottomInfo();
     }
   }
 
   componentWillUnmount() {
-    // disconnect();
-    // DeviceEventEmitter.removeAllListeners();
+    disconnect();
+    DeviceEventEmitter.removeAllListeners();
   }
 
   onSearchPress = () => {
@@ -164,14 +167,15 @@ export class App extends Component {
   };
 
   showBottomInfo = () => {
-    const {instituteToShow} = this.props;
-    const buldingName = instituteToShow.office.split('')[0].toLowerCase();
+    const {objectToShow} = this.props;
+    const buldingName = objectToShow.office.split('')[0].toLowerCase();
     this.bottomSheet.snapTo(1);
     this.imageZoomRef.centerOn(getBuildingCoordinates[buldingName]);
   };
 
   render() {
     const {eddystones} = this.props;
+    console.log(eddystones);
     return (
       <Container>
         <Button
@@ -193,23 +197,12 @@ export class App extends Component {
         </Button>
         <BottomSheet
           getRef={r => (this.bottomSheet = r)}
-          instituteToShow={this.props.instituteToShow}
+          objectToShow={this.props.objectToShow}
           onClose={() => {
-            this.props.setInstituteToShow(null);
+            this.props.setObjectToShow(null);
             this.imageZoomRef.centerOn({x: 0, y: 0, scale: 1, duration: 200});
           }}
         />
-        {/* <BottomSheet
-          ref={r => (this.bottomSheet = r)}
-          snapPoints={[HEIGHT * 0.6, HEIGHT * 0.27, 0]}
-          initialSnap={2}
-          renderContent={this.renderContent}
-          borderRadius={10}
-          onCloseEnd={() => {
-            this.props.setInstituteToShow(null);
-            this.imageZoomRef.centerOn({x: 0, y: 0, scale: 1, duration: 200});
-          }}
-        /> */}
         <Content style={{backgroundColor: '#eee'}}>
           <ImageZoom
             ref={ref => (this.imageZoomRef = ref)}
@@ -225,57 +218,9 @@ export class App extends Component {
               style={{width: WIDTH, height: WIDTH}}
               source={require('./assets/images/kampus.jpg')}
             />
-            {/* <TouchableOpacity
-            style={{
-              width: WIDTH * 0.095,
-              height: WIDTH * 0.185,
-              left: WIDTH * 0.095,
-              top: WIDTH * 0.225,
-              borderColor: 'red',
-              borderWidth: 1,
-              position: 'absolute',
-            }}
-          />
-          <TouchableOpacity
-            style={{
-              width: WIDTH * 0.25,
-              height: WIDTH * 0.185,
-              left: WIDTH * 0.23,
-              top: WIDTH * 0.22,
-              borderColor: 'red',
-              borderWidth: 1,
-              position: 'absolute',
-            }}
-          /> */}
           </ImageZoom>
         </Content>
       </Container>
-      //</View>
-      // {/* <Button
-      //     title="Detail"
-      //     onPress={() => this.props.navigation.navigate('Detail')}
-      //   /> */}
-      //   {/* <FlatList
-      //       data={eddystones}
-      //       renderItem={({item, index}) => {
-      //         return (
-      //           <View>
-      //             <Text style={styles.listItemText}>
-      //               Beacon ID: {item.instanceId}
-      //             </Text>
-      //             <Text style={styles.listItemText}>
-      //               Odległość: {item.accuracy.toFixed(1)}m
-      //             </Text>
-      //           </View>
-      //         );
-      //       }}
-      //       keyExtractor={(item, index) => index.toString()}
-      //     />
-      //     <Button title="Start scanning" onPress={() => startScanning()} />
-      //     <Button title="Stop scanning" onPress={() => stopScanning()} /> */}
-      //   {/* <View style={styles.testBox}>
-      //       <Text>asd</Text>
-      //     </View> */}
     );
   }
 }
@@ -310,14 +255,14 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state => ({
   eddystones: state.beacons.eddystones,
-  instituteToShow: state.search.instituteToShow,
+  objectToShow: state.search.objectToShow,
 });
 
 const mapDispatchToProps = dispatch => ({
   addEddystone: eddystone => dispatch(addEddystone(eddystone)),
   deleteEddystones: id => dispatch(deleteEddystones(id)),
   updateEddystones: eddystones => dispatch(updateEddystones(eddystones)),
-  setInstituteToShow: id => dispatch(setInstituteToShow(id)),
+  setObjectToShow: obj => dispatch(setObjectToShow(obj)),
 });
 
 export default connectToStore(mapStateToProps, mapDispatchToProps)(App);

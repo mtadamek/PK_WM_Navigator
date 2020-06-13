@@ -33,9 +33,9 @@ const HEIGHT = Window.height;
 
 export default class BottomSheet extends Component {
   renderContent = () => {
-    const {instituteToShow} = this.props;
+    const {objectToShow} = this.props;
 
-    return instituteToShow ? (
+    return objectToShow ? (
       <BoxShadow
         setting={{
           width: WIDTH,
@@ -78,7 +78,7 @@ export default class BottomSheet extends Component {
                 <Thumbnail
                   square
                   source={{
-                    uri: SERVER_URL + 'files/' + instituteToShow.image,
+                    uri: SERVER_URL + 'files/' + objectToShow.image,
                   }}
                   style={{height: '75%', width: '75%'}}
                 />
@@ -90,7 +90,10 @@ export default class BottomSheet extends Component {
                   alignItems: 'flex-start',
                 }}>
                 <H3 style={{marginLeft: 10, marginRight: 18}}>
-                  {instituteToShow.name}
+                  {objectToShow.name ||
+                    `${objectToShow.degree} ${objectToShow.forename} ${
+                      objectToShow.surname
+                    }`}
                 </H3>
                 <Text
                   style={{
@@ -99,7 +102,8 @@ export default class BottomSheet extends Component {
                     marginTop: 5,
                     fontSize: 18,
                   }}>
-                  Sekretariat: {instituteToShow.office}
+                  {objectToShow.name ? 'Sekretariat:' : 'Gabinet:'}{' '}
+                  {objectToShow.office}
                 </Text>
               </Col>
             </Row>
@@ -111,29 +115,32 @@ export default class BottomSheet extends Component {
                   marginLeft: 18,
                   marginRight: 18,
                 }}>
-                <TouchableOpacity
-                  onPress={() => Linking.openURL('geo:50.074987, 19.997728')}>
-                  <Text style={{fontSize: 18, marginBottom: 7}}>
-                    Adres: {instituteToShow.address}
-                  </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  onPress={() =>
-                    Linking.openURL('mailto:' + instituteToShow.email)
-                  }>
-                  <Text style={{fontSize: 18, marginBottom: 7}}>
-                    Email: {instituteToShow.email}
-                  </Text>
-                </TouchableOpacity>
+                {objectToShow.address && (
+                  <TouchableOpacity
+                    onPress={() => Linking.openURL('geo:50.074987, 19.997728')}>
+                    <Text style={{fontSize: 18, marginBottom: 7}}>
+                      Adres: {objectToShow.address}
+                    </Text>
+                  </TouchableOpacity>
+                )}
                 <TouchableOpacity
                   onPress={() =>
-                    Linking.openURL('tel:' + instituteToShow.phone)
+                    Linking.openURL('mailto:' + objectToShow.email)
                   }>
                   <Text style={{fontSize: 18, marginBottom: 7}}>
-                    Telefon: {instituteToShow.phone}
+                    Email: {objectToShow.email}
                   </Text>
                 </TouchableOpacity>
+                {objectToShow.phone && (
+                  <TouchableOpacity
+                    onPress={() =>
+                      Linking.openURL('tel:' + objectToShow.phone)
+                    }>
+                    <Text style={{fontSize: 18, marginBottom: 7}}>
+                      Telefon: {objectToShow.phone}
+                    </Text>
+                  </TouchableOpacity>
+                )}
               </Col>
             </Row>
           </Grid>

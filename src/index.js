@@ -5,11 +5,11 @@ import {Provider} from 'react-redux';
 import {NavigationContainer} from '@react-navigation/native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createStackNavigator} from '@react-navigation/stack';
-import {Icon} from 'native-base';
+import {Root} from 'native-base';
 import store from './store';
 import App from './App';
 import Search from './screens/Search';
-import Institutes from './screens/Institutes';
+import Employees from './screens/Employees';
 import Colors from './constants/Colors';
 
 const Stack = createStackNavigator();
@@ -65,27 +65,29 @@ const Map = () => (
 
 const Init = () => (
   <Provider store={store}>
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen
-          name="Home"
-          options={{headerShown: false}}
-          component={gestureHandlerRootHOC(App)}
-        />
-        <Stack.Screen
-          name="Search"
-          options={{
-            headerShown: false,
-          }}
-          component={Search}
-        />
-        <Stack.Screen
-          name="Institutes"
-          options={{headerTitle: 'Instytuty'}}
-          component={Institutes}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <Root>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="Home">
+          <Stack.Screen
+            name="Home"
+            options={{headerShown: false}}
+            component={gestureHandlerRootHOC(App)}
+          />
+          <Stack.Screen
+            name="Search"
+            options={{
+              headerShown: false,
+            }}
+            component={Search}
+          />
+          <Stack.Screen
+            name="Employees"
+            options={{headerTitle: 'Pracownicy'}}
+            component={Employees}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </Root>
   </Provider>
 );
 
