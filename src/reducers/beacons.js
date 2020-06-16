@@ -1,5 +1,4 @@
 import {
-  SET_SCANNING_STATE,
   ADD_EDDYSTONE,
   DELETE_EDDYSTONE,
   UPDATE_EDDYSTONES,
@@ -13,8 +12,6 @@ const initialState = {
 export default (state = initialState, action) => {
   const {type, payload} = action;
   switch (type) {
-    case SET_SCANNING_STATE:
-      return {...state, scanning: payload};
     case ADD_EDDYSTONE:
       const tempArray = state.eddystones.filter(
         eddy => eddy.instanceId !== payload.instanceId,

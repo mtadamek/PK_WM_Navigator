@@ -46,7 +46,7 @@ export class Employees extends Component {
    */
   onPress = employee => {
     this.props.setObjectToShow(employee);
-    this.props.navigation.navigate('Home');
+    this.props.navigation.navigate('Map');
   };
 
   /**
@@ -72,7 +72,7 @@ export class Employees extends Component {
         }}
         onPress={() => {
           this.props.setObjectToShow(employee);
-          this.props.navigation.navigate('Home');
+          this.props.navigation.navigate('Map');
         }}>
         <Thumbnail
           square

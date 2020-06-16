@@ -58,7 +58,7 @@ export class QueryIsNotEmpty extends Component {
         onPress={() => {
           console.log(this.props);
           this.props.setObjectToShow(item);
-          this.props.navigateTo('Home');
+          this.props.navigateTo('Map');
         }}>
         <Thumbnail square source={{uri: SERVER_URL + 'files/' + item.image}} />
         <Text style={{flex: 1, marginLeft: 15}}>

@@ -54,7 +54,7 @@ class QueryIsEmpty extends Component {
     switch (btnIndex) {
       case 0:
         this.props.setObjectToShow(institute);
-        this.props.navigateTo('Home');
+        this.props.navigateTo('Map');
         break;
       case 1:
         this.props.navigateTo('Employees', {instituteId: institute._id});
