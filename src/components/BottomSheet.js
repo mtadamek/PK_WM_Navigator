@@ -31,7 +31,16 @@ const Window = Dimensions.get('window');
 const WIDTH = Window.width;
 const HEIGHT = Window.height;
 
+/**
+ * Komponent wyświetlany na widoku Search, kiedy pole wyszukiwania nie jest puste.
+ * @name BottomSheet
+ * @example <BottomSheet getRef={r => (this.bottomSheet = r)} objectToShow={objectToShow} onClose={() => {}} />
+ */
 export default class BottomSheet extends Component {
+  /**
+   * Metoda zwracająca komponenty, które mają być wyświetlone w BottomSheet.
+   * @return {React.Component} any
+   */
   renderContent = () => {
     const {objectToShow} = this.props;
 
@@ -157,6 +166,10 @@ export default class BottomSheet extends Component {
     );
   };
 
+  /**
+   * Metoda zwracająca komponenty intefejsu użytkownika.
+   * @return {React.Component} any
+   */
   render() {
     return (
       <BSheet

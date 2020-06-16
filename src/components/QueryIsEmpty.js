@@ -30,15 +30,26 @@ const BUTTONS = [
 ];
 const CANCEL_INDEX = 2;
 
+/**
+ * Komponent wyświetlany na widoku Search, kiedy pole wyszukiwania jest puste.
+ * @name QueryIsEmpty
+ * @example <QueryIsEmpty navigateTo={(screenName, paramsObject)=>{}} setObjectToShow={(object)=>{}} />
+ */
 class QueryIsEmpty extends Component {
   state = {modalVisible: false};
 
+  /** Metoda zostaje wywołana kiedy komponent został zamontowany. */
   componentDidMount() {
-    if (this.props.institutes.length === 0) this.props.getInstitutes();
+    if (this.props.institutes.length === 0) {
+      /** Pobiera instytuty z serwera */
+      this.props.getInstitutes();
+    }
   }
 
+  /** Metoda wywołująca się podczas odświeżenia komoponentu przez użytkownika. */
   onRefresh = () => this.props.getInstitutes();
 
+  /** Metoda wywołująca się po wybraniu przez użytkownika opcji z menu akcji. */
   onActionSheetPress = (btnIndex, institute) => {
     switch (btnIndex) {
       case 0:
@@ -54,6 +65,10 @@ class QueryIsEmpty extends Component {
     }
   };
 
+  /**
+   * Metoda zwracająca komponenty intefejsu użytkownika.
+   * @return {React.Component} any
+   */
   render() {
     const {loading, error, institutes} = this.props;
     const instituteThumbnailsList = institutes.map(institute => (

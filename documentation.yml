@@ -1,0 +1,38 @@
+toc:
+  - name: Screens
+    description: Sekcja zawierająca widoki aplikacji.
+    children:
+      - Map
+      - Search
+      - Employees
+  - name: Components
+    description: Komponenty aplikacji.
+    children:
+      - BottomSheet
+      - QueryIsEmpty
+      - QueryIsNotEmpty
+      - SearchBar
+  - name: Actions
+    description: Spis akcji.
+    children:
+      - getInstitutes
+      - getEmployees
+      - getInstitutesAndEmployees
+      - addEddystone
+      - deleteEddystones
+      - updateEddystones
+  - name: Methods
+    description: Motody aplikacji.
+    children:
+      - init
+      - connect
+      - disconnect
+      - configure
+      - setEddystoneNamespace
+      - addListener
+      - removeAllListeners
+      - axios
+  - name: Constants
+    description:
+    children:
+      - getBuildingCoordinates

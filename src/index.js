@@ -7,30 +7,30 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {createStackNavigator} from '@react-navigation/stack';
 import {Root} from 'native-base';
 import store from './store';
-import App from './App';
+import Map from './screens/Map';
 import Search from './screens/Search';
 import Employees from './screens/Employees';
 import Colors from './constants/Colors';
 
 const Stack = createStackNavigator();
-const Tab = createBottomTabNavigator();
+// const Tab = createBottomTabNavigator();
 
-const Map = () => (
-  <Stack.Navigator>
-    <Stack.Screen
-      name="Home"
-      options={{headerShown: false}}
-      component={gestureHandlerRootHOC(App)}
-    />
-    <Stack.Screen
-      name="Search"
-      options={{
-        headerShown: false,
-      }}
-      component={Search}
-    />
-  </Stack.Navigator>
-);
+// const Map = () => (
+//   <Stack.Navigator>
+//     <Stack.Screen
+//       name="Home"
+//       options={{headerShown: false}}
+//       component={gestureHandlerRootHOC(App)}
+//     />
+//     <Stack.Screen
+//       name="Search"
+//       options={{
+//         headerShown: false,
+//       }}
+//       component={Search}
+//     />
+//   </Stack.Navigator>
+// );
 
 // const Init = () => (
 //   <Provider store={store}>
@@ -63,15 +63,19 @@ const Map = () => (
 //   </Provider>
 // );
 
-const Init = () => (
+/**
+ * Funkcja inicjalizująca. Zwraca komponenty niezbędne do działania aplikacji (navigation, store).
+ * @return {React.Component} any
+ */
+const init = () => (
   <Provider store={store}>
     <Root>
       <NavigationContainer>
-        <Stack.Navigator initialRouteName="Home">
+        <Stack.Navigator initialRouteName="Map">
           <Stack.Screen
-            name="Home"
+            name="Map"
             options={{headerShown: false}}
-            component={gestureHandlerRootHOC(App)}
+            component={gestureHandlerRootHOC(Map)}
           />
           <Stack.Screen
             name="Search"
@@ -91,4 +95,4 @@ const Init = () => (
   </Provider>
 );
 
-export default Init;
+export default init;

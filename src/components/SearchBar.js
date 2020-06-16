@@ -3,7 +3,16 @@ import {Header, Grid, Row, Col, Button, Icon} from 'native-base';
 import {TextInput} from 'react-native';
 import Colors from '../constants/Colors';
 
+/**
+ * Panel z polem wyszukiwania.
+ * @name SearchBar
+ * @example <SearchBar onChangeSearchQuery={this.onChangeSearchQuery} goBack={this.goBack} />
+ */
 export default class SearchBar extends React.Component {
+  /**
+   * Metoda zwracająca komponenty intefejsu użytkownika.
+   * @return {React.Component} any
+   */
   render() {
     return (
       <Header style={{backgroundColor: Colors.primary}}>
@@ -15,10 +24,7 @@ export default class SearchBar extends React.Component {
                 justifyContent: 'center',
                 alignItems: 'flex-start',
               }}>
-              <Button
-                transparent
-                iconRight
-                onPress={() => this.props.goBack()}>
+              <Button transparent iconRight onPress={() => this.props.goBack()}>
                 <Icon name="arrow-back" />
               </Button>
             </Col>

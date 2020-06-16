@@ -5,6 +5,10 @@ const WIDTH = Window.width;
 const scale = 3;
 const duration = 300;
 
+/** 
+ * Zawiera parametry położenia budynków kampusu na mapie
+ * @example getBuildingCoordinates['a'].x;
+ */
 export default {
   a: {x: -(WIDTH / 2) * 0.34, y: -(WIDTH / 2) * 0.3, scale, duration},
   b: {x: -(WIDTH / 2) * 0.076, y: -(WIDTH / 2) * 0.35, scale, duration},

@@ -16,24 +16,43 @@ import {connect} from 'react-redux';
 import {getEmployees, setObjectToShow} from '../actions/search';
 import {SERVER_URL} from '../../config';
 
+/**
+ * Widok "Pracownicy"
+ * @name Employees
+ */
 export class Employees extends Component {
+  /** Metoda zostaje wywołana kiedy komponent został zamontowany. */
   componentDidMount() {
     const {params} = this.props.route;
-    if (params && params.instituteId)
+    if (params && params.instituteId) {
+      /**
+       * Pobiera pracowników danego instytutu z serwera
+       * @param {string} instituteId - Identyfikator instytutu
+       */
       this.props.getEmployees(params.instituteId);
+    }
   }
 
+  /** Metoda wywołująca się podczas odświeżenia widoku przez użytkownika. */
   onRefresh = () => {
     const {params} = this.props.route;
     if (params && params.instituteId)
       this.props.getEmployees(params.instituteId);
   };
 
+  /**
+   * Metoda wywołująca się po tapniąciu na pracownika.
+   * @param {object} employee - zawiera informacje pracownika
+   */
   onPress = employee => {
     this.props.setObjectToShow(employee);
     this.props.navigation.navigate('Home');
   };
 
+  /**
+   * Metoda zwracająca komponenty intefejsu użytkownika.
+   * @return {React.Component} any
+   */
   render() {
     const {loading, error, employees} = this.props;
     const employeeThumbnailsList = employees.map(employee => (

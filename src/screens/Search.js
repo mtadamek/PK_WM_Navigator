@@ -36,15 +36,30 @@ import QueryIsEmpty from '../components/QueryIsEmpty';
 import QueryIsNotEmpty from '../components/QueryIsNotEmpty';
 import {setObjectToShow, setSearchQuery} from '../actions/search';
 
+/**
+ * Widok "Szukaj"
+ * @name Search
+ */
 class Search extends React.Component {
+  /** Funkcja zostaje wywołana kiedy komponent został zamontowany. */
   componentDidMount() {
     this.props.setSearchQuery('');
   }
 
+  /**
+   * Funkcja aktualizuje parametr query, który przechowywuje wartość pola wyszukiwania.
+   * @param {string} text
+   */
   onChangeSearchQuery = text => this.props.setSearchQuery(text);
 
+  /** Funkcja wywułuje powrót do poprzedniego widoku. */
   goBack = () => this.props.navigation.goBack();
 
+  /**
+   * Funkcja zmienia widok aplikacji.
+   * @param {string} screen
+   * @param {string} params
+   */
   navigateTo = (screen, params) =>
     this.props.navigation.navigate(screen, params);
 
@@ -56,6 +71,10 @@ class Search extends React.Component {
   //   );
   //   const names = instituteNames.concat(employeeNames);
 
+  /**
+   * Metoda zwracająca komponenty intefejsu użytkownika.
+   * @return {React.Component} any
+   */
   render() {
     const {query, error, institutes, employees} = this.props;
     let dataToShow = [];
