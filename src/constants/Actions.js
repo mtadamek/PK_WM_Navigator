@@ -1,8 +1,12 @@
 //===BEACONS
 /** @constant {String} */
+export const SET_NAMESPACE = 'SET_NAMESPACE';
+/** @constant {String} */
 export const ADD_EDDYSTONE = 'ADD_EDDYSTONE';
 /** @constant {String} */
 export const DELETE_EDDYSTONE = 'DELETE_EDDYSTONE';
+/** @constant {String} */
+export const UPDATE_EDDYSTONE = 'UPDATE_EDDYSTONE';
 /** @constant {String} */
 export const UPDATE_EDDYSTONES = 'UPDATE_EDDYSTONES';
 

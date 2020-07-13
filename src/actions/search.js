@@ -1,4 +1,4 @@
-import axios from '../utils/axios';
+import axios, {axiosEmployees} from '../utils/axios';
 import {
   GET_INSTITUTES_REQUEST,
   GET_INSTITUTES_SUCCESS,
@@ -68,8 +68,41 @@ const getInstitutesError = error => ({
 export const getEmployees = instituteId => async dispatch => {
   try {
     dispatch(getEmployeesRequest());
-    const res = await axios().get('/api/employees', {params: {instituteId}});
-    dispatch(getEmployeesSuccess(res.data));
+
+    let data = new FormData();
+    data.append(
+      'ou',
+      'ou=Instytut Informatyki Stosowanej (M-07),ou=Wydział Mechaniczny (M),ou=Wydzialy (W),o=Politechnika Krakowska (PK),dc=pk,dc=pl',
+    );
+    data.append('child', '1');
+    data.append('wybor_szukaj', '1');
+    let offset = 1;
+    data.append('offset', '1');
+
+    const res = await axiosEmployees().post('/', data);
+    const count = Math.ceil(res.data.count / 10);
+    console.log('data', data);
+
+    let employees = res.data.list;
+
+    // while (count > offset) {
+    //   offset++;
+    //   data = new FormData();
+    //   data.append(
+    //     'ou',
+    //     'ou=Instytut Informatyki Stosowanej (M-07),ou=Wydział Mechaniczny (M),ou=Wydzialy (W),o=Politechnika Krakowska (PK),dc=pk,dc=pl',
+    //   );
+    //   data.append('child', 1);
+    //   data.append('wybor_szukaj', 1);
+    //   data.append('offset', offset);
+
+    //   const next = await axiosEmployees().post('/', data);
+    //   //console.log('next',next.data);
+    //   employees = employees.concat(next.data.list);
+    // }
+
+    console.log(employees);
+    dispatch(getEmployeesSuccess(employees));
   } catch (error) {
     dispatch(getEmployeesError(error));
   }

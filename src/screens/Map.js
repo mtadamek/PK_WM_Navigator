@@ -8,6 +8,7 @@ import {
   Dimensions,
   Linking,
   Image,
+  TouchableOpacity,
 } from 'react-native';
 import {
   Container,
@@ -21,7 +22,10 @@ import {
   Col,
   Thumbnail,
   Fab,
+  List,
+  ListItem,
 } from 'native-base';
+import {ScrollView} from 'react-native-gesture-handler';
 import {connect as connectToStore} from 'react-redux';
 import {request, PERMISSIONS} from 'react-native-permissions';
 import Kontakt from 'react-native-kontaktio';
@@ -30,13 +34,18 @@ import Modal from 'react-native-modal';
 import SplashScreen from 'react-native-splash-screen';
 
 import BottomSheet from '../components/BottomSheet';
+import Floors from '../components/Floors';
 import {
+  setNamespace,
   addEddystone,
   deleteEddystones,
+  updateEddystone,
   updateEddystones,
 } from '../actions/beacons';
 import {setObjectToShow} from '../actions/search';
 import getBuildingCoordinates from '../utils/getBuildingCoordinates';
+import getBuildingStyle from '../utils/getBuildingStyle';
+import mapNamespaceToBuldingName from '../utils/mapNamespaceToBuldingName';
 import Colors from '../constants/Colors';
 
 const {
@@ -65,6 +74,8 @@ const HEIGHT = Window.height;
  * Map
  */
 export class Map extends Component {
+  state = {active: false, activeFloor: 0};
+  eddystoneTimeouts = {};
   /**
    * Funkcja wyświetlająca alert odnośnie odmowy dostępu do lokalizacji urządzenia.
    */
@@ -146,6 +157,16 @@ export class Map extends Component {
        */
       await setEddystoneNamespace();
 
+      // DeviceEventEmitter.addListener('namespaceDidEnter', ({namespace}) => {
+      //   console.log('!!!set namespace!!!', namespace);
+      //   /** Ustawia aktualny namespace.  */
+      //   this.props.setNamespace(namespace);
+      // });
+
+      // DeviceEventEmitter.addListener('namespaceDidExit', ({namespace}) => {
+      //   console.log('!!!namespaceDidExit!!!', namespace);
+      // });
+
       /**
        * Dodaje obsługę konkretnego zdarzenia.
        * @param {String} eventName - Nazwa zdarzenia.
@@ -156,31 +177,68 @@ export class Map extends Component {
       DeviceEventEmitter.addListener(
         'eddystoneDidAppear',
         ({eddystone, namespace}) => {
-          console.log('!!!Dodano beacon!!!', eddystone);
-          /** Dodaje znaleziony beacon. */
-          this.props.addEddystone(eddystone);
-        },
-      );
+          if (
+            this.eddystoneTimeouts[eddystone.namespace + eddystone.instanceId]
+          ) {
+            clearTimeout(
+              this.eddystoneTimeouts[
+                eddystone.namespace + eddystone.instanceId
+              ],
+            );
+            delete this.eddystoneTimeouts[
+              eddystone.namespace + eddystone.instanceId
+            ];
 
-      DeviceEventEmitter.addListener(
-        'eddystoneDidDisappear',
-        ({eddystone, namespace}) => {
-          console.log('!!!eddystoneDidDisappear!!!', eddystone);
-          /** Usuwa beacon, który zniknął z pola skanowania. */
-          this.props.deleteEddystones(eddystone.instanceId);
+            this.props.updateEddystone(eddystone);
+          } else {
+            /** Dodaje znaleziony beacon. */
+            this.props.addEddystone(eddystone);
+          }
+
+          // let nearest = eddystone;
+
+          // this.props.eddystones.forEach(eddy => {
+          //   if (eddy.accuracy < eddy.accuracy) nearest = eddy;
+          // });
+
+          // this.props.setNamespace(nearest.namespace);
         },
       );
 
       DeviceEventEmitter.addListener(
         'eddystonesDidUpdate',
         ({eddystones, namespace}) => {
+          let nearest = null;
+
           eddystones.forEach(eddystone => {
-            console.log('!!!Aktualizacja!!!', eddystone.instanceId);
+            if (!nearest) nearest = eddystone;
+            if (eddystone.accuracy < nearest.accuracy) nearest = eddystone;
           });
+
+          this.props.setNamespace(nearest.namespace);
           /** Aktualizuje parametry beacon-a. */
           this.props.updateEddystones(eddystones);
         },
       );
+
+      DeviceEventEmitter.addListener(
+        'eddystoneDidDisappear',
+        ({eddystone, namespace}) => {
+          //console.log('!!!eddystoneDidDisappear!!!', eddystone);
+
+          this.eddystoneTimeouts[
+            eddystone.namespace + eddystone.instanceId
+          ] = setTimeout(() => {
+            delete this.eddystoneTimeouts[
+              eddystone.namespace + eddystone.instanceId
+            ];
+
+            /** Usuwa beacon, który zniknął z pola skanowania. */
+            this.props.deleteEddystones(eddystone);
+          }, 5000);
+        },
+      );
+
       //stopScanning();
       //startScanning();
     } catch (error) {
@@ -193,7 +251,8 @@ export class Map extends Component {
    */
   componentDidMount() {
     SplashScreen.hide();
-    this.locationPermissionRequest();
+    //this.imageZoomRef.centerOn({...getBuildingCoordinates['l'], duration: 1});
+    //this.locationPermissionRequest();
   }
 
   /**
@@ -214,19 +273,19 @@ export class Map extends Component {
      * @return {undefined} - nic.
      * @example disconnect();
      */
-    disconnect();
+    //disconnect();
     /**
      * Usuwa obsługę wszystkich zdarzeń.
      * @return {undefined} - nic.
      * @example removeAllListeners();
      */
-    DeviceEventEmitter.removeAllListeners();
+    //DeviceEventEmitter.removeAllListeners();
   }
 
   /**
    * Funkcja przełączająca widok na Szukaj.
    */
-  onSearchPress = () => {
+  onSearchPress = async () => {
     this.props.navigation.navigate('Search');
   };
 
@@ -245,7 +304,46 @@ export class Map extends Component {
    * @return {React.Component} any
    */
   render() {
-    const {eddystones} = this.props;
+    const {eddystones, namespace} = this.props;
+
+    const activeBuildingMap = {
+      j0: (
+        <Image
+          style={{width: WIDTH, height: WIDTH * 1.2}}
+          source={require(`../assets/images/J_0.png`)}
+        />
+      ),
+      j1: (
+        <Image
+          style={{width: WIDTH, height: WIDTH * 1.2}}
+          source={require(`../assets/images/J_1.png`)}
+        />
+      ),
+    };
+
+    const activeBuilding = (
+      <TouchableOpacity
+        style={getBuildingStyle[mapNamespaceToBuldingName[namespace]]}
+      />
+    );
+
+    const eddystoneItems = eddystones.map(eddy => (
+      <ListItem key={eddy.namespace + eddy.instanceId}>
+        <Grid>
+          <Col>
+            <Row>
+              <Text>Namespace: {eddy.namespace}</Text>
+            </Row>
+            <Row>
+              <Text>ID: {eddy.instanceId}</Text>
+            </Row>
+            <Row>
+              <Text>Odległość: {eddy.accuracy}</Text>
+            </Row>
+          </Col>
+        </Grid>
+      </ListItem>
+    ));
     return (
       <Container>
         <Button
@@ -253,9 +351,9 @@ export class Map extends Component {
           iconLeft
           block
           style={{
-            left: 20,
-            right: 20,
-            top: 20,
+            left: WIDTH * 0.05,
+            right: WIDTH * 0.3,
+            top: WIDTH * 0.05,
             position: 'absolute',
             zIndex: 1,
             opacity: 0.9,
@@ -265,6 +363,25 @@ export class Map extends Component {
           <Icon name="search" />
           <Text>Szukaj</Text>
         </Button>
+        <Button
+          rounded
+          iconLeft
+          block
+          style={{
+            left: WIDTH * 0.8,
+            right: WIDTH * 0.05,
+            top: WIDTH * 0.05,
+            position: 'absolute',
+            zIndex: 1,
+            opacity: 0.9,
+            backgroundColor: Colors.primary,
+          }}
+          onPress={async () => {
+            if (await isScanning()) stopScanning();
+            else startScanning();
+          }}>
+          <Icon name="play" />
+        </Button>
         <BottomSheet
           getRef={r => (this.bottomSheet = r)}
           objectToShow={this.props.objectToShow}
@@ -273,23 +390,38 @@ export class Map extends Component {
             this.imageZoomRef.centerOn({x: 0, y: 0, scale: 1, duration: 200});
           }}
         />
+
+        <ScrollView
+          style={{
+            left: 20,
+            right: 20,
+            bottom: 20,
+            position: 'absolute',
+            zIndex: 1,
+            opacity: 0.9,
+            backgroundColor: Colors.secondary,
+          }}>
+          <List>{eddystoneItems}</List>
+        </ScrollView>
+
         <Content style={{backgroundColor: '#eee'}}>
           <ImageZoom
             ref={ref => (this.imageZoomRef = ref)}
             cropWidth={WIDTH}
-            cropHeight={HEIGHT * 0.95}
+            cropHeight={HEIGHT}
             imageWidth={WIDTH}
-            imageHeight={WIDTH}
+            imageHeight={WIDTH * 1.2}
             enableSwipeDown={false}
             doubleClickInterval={300}
             maxScale={3}
             minScale={1}>
-            <Image
-              style={{width: WIDTH, height: WIDTH}}
-              source={require('../assets/images/kampus.jpg')}
-            />
+            {activeBuildingMap[`j${this.state.activeFloor}`]}
           </ImageZoom>
         </Content>
+        <Floors
+          floorsCount={3}
+          onFloorPress={floor => this.setState({activeFloor: floor})}
+        />
       </Container>
     );
   }
@@ -324,13 +456,16 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = state => ({
+  namespace: state.beacons.namespace,
   eddystones: state.beacons.eddystones,
   objectToShow: state.search.objectToShow,
 });
 
 const mapDispatchToProps = dispatch => ({
+  setNamespace: namespace => dispatch(setNamespace(namespace)),
   addEddystone: eddystone => dispatch(addEddystone(eddystone)),
-  deleteEddystones: id => dispatch(deleteEddystones(id)),
+  deleteEddystones: eddystone => dispatch(deleteEddystones(eddystone)),
+  updateEddystone: eddystone => dispatch(updateEddystone(eddystone)),
   updateEddystones: eddystones => dispatch(updateEddystones(eddystones)),
   setObjectToShow: obj => dispatch(setObjectToShow(obj)),
 });
