@@ -95,18 +95,20 @@ class Search extends React.Component {
           onChangeSearchQuery={this.onChangeSearchQuery}
           goBack={this.goBack}
         />
-        {query === '' ? (
-          <QueryIsEmpty
-            navigateTo={this.navigateTo}
-            setObjectToShow={this.props.setObjectToShow}
-          />
-        ) : (
-          <QueryIsNotEmpty
-            navigateTo={this.navigateTo}
-            setObjectToShow={this.props.setObjectToShow}
-            dataToShow={dataToShow}
-          />
-        )}
+        <Content style={{flex: 1}} contentContainerStyle={{flex: 1}}>
+          {query === '' ? (
+            <QueryIsEmpty
+              navigateTo={this.navigateTo}
+              setObjectToShow={this.props.setObjectToShow}
+            />
+          ) : (
+            <QueryIsNotEmpty
+              navigateTo={this.navigateTo}
+              setObjectToShow={this.props.setObjectToShow}
+              dataToShow={dataToShow}
+            />
+          )}
+        </Content>
       </Container>
     );
   }

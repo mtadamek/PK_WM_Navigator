@@ -14,9 +14,9 @@ export default () =>
     },
   });
 
-export const axiosEmployees = () =>
+export const axiosPK = () =>
   axios.create({
-    baseURL: 'https://spispracownikow.pk.edu.pl/data.php',
+    baseURL: 'https://spispracownikow.pk.edu.pl',
     timeout: 10000,
     headers: {
       'Content-Type': 'multipart/form-data',

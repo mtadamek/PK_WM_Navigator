@@ -86,9 +86,11 @@ export default class BottomSheet extends Component {
                 }}>
                 <Thumbnail
                   square
-                  source={{
-                    uri: SERVER_URL + 'files/' + objectToShow.image,
-                  }}
+                  source={
+                    objectToShow.givenName.split('').pop() === 'a'
+                      ? require('../assets/images/woman.png')
+                      : require('../assets/images/man.png')
+                  }
                   style={{height: '75%', width: '75%'}}
                 />
               </Col>
@@ -99,10 +101,11 @@ export default class BottomSheet extends Component {
                   alignItems: 'flex-start',
                 }}>
                 <H3 style={{marginLeft: 10, marginRight: 18}}>
-                  {objectToShow.name ||
-                    `${objectToShow.degree} ${objectToShow.forename} ${
-                      objectToShow.surname
-                    }`}
+                  {`${
+                    objectToShow.pleduPersonDegree === '---'
+                      ? null
+                      : objectToShow.pleduPersonDegree + ' '
+                  }${objectToShow.givenName} ${objectToShow.sn}`}
                 </H3>
                 <Text
                   style={{
@@ -111,8 +114,7 @@ export default class BottomSheet extends Component {
                     marginTop: 5,
                     fontSize: 18,
                   }}>
-                  {objectToShow.name ? 'Sekretariat:' : 'Gabinet:'}{' '}
-                  {objectToShow.office}
+                  {objectToShow.physicalDeliveryOfficeName}
                 </Text>
               </Col>
             </Row>
@@ -132,24 +134,27 @@ export default class BottomSheet extends Component {
                     </Text>
                   </TouchableOpacity>
                 )}
-                <TouchableOpacity
-                  onPress={() =>
-                    Linking.openURL('mailto:' + objectToShow.email)
-                  }>
-                  <Text style={{fontSize: 18, marginBottom: 7}}>
-                    Email: {objectToShow.email}
-                  </Text>
-                </TouchableOpacity>
-                {objectToShow.phone && (
-                  <TouchableOpacity
-                    onPress={() =>
-                      Linking.openURL('tel:' + objectToShow.phone)
-                    }>
-                    <Text style={{fontSize: 18, marginBottom: 7}}>
-                      Telefon: {objectToShow.phone}
-                    </Text>
-                  </TouchableOpacity>
-                )}
+
+                <Text style={{fontSize: 18, marginBottom: 7}}>Kontakt:</Text>
+                {objectToShow.mails &&
+                  objectToShow.mails.map(m => (
+                    <TouchableOpacity
+                      key={m}
+                      onPress={() =>
+                        Linking.openURL('mailto:' + objectToShow.email)
+                      }>
+                      <Text style={{fontSize: 16, marginBottom: 7}}>{m}</Text>
+                    </TouchableOpacity>
+                  ))}
+
+                {objectToShow.phone &&
+                  objectToShow.phone.map(p => (
+                    <TouchableOpacity
+                      key={p}
+                      onPress={() => Linking.openURL('tel:' + p)}>
+                      <Text style={{fontSize: 18, marginBottom: 7}}>{p}</Text>
+                    </TouchableOpacity>
+                  ))}
               </Col>
             </Row>
           </Grid>

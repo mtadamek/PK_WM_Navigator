@@ -46,3 +46,5 @@ export const GET_INSTITUTES_AND_EMPLOYEES_ERROR =
 export const SET_OBJECT_TO_SHOW = 'SET_OBJECT_TO_SHOW';
 /** @constant {String} */
 export const SET_SEARCH_QUERY = 'SET_SEARCH_QUERY';
+/** @constant {String} */
+export const CLEAR_EMPLOYEES = 'CLEAR_EMPLOYEES';

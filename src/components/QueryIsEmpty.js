@@ -20,6 +20,7 @@ import {
 } from 'native-base';
 import {getInstitutes} from '../actions/search';
 import mapCategoryName from '../utils/mapCategoryName';
+import getInstituteLogo from '../utils/getInstituteLogo';
 import Colors from '../constants/Colors';
 import {SERVER_URL} from '../../config';
 
@@ -57,7 +58,7 @@ class QueryIsEmpty extends Component {
         this.props.navigateTo('Map');
         break;
       case 1:
-        this.props.navigateTo('Employees', {instituteId: institute._id});
+        this.props.navigateTo('Employees', {instituteId: institute.id});
         break;
 
       default:
@@ -71,9 +72,14 @@ class QueryIsEmpty extends Component {
    */
   render() {
     const {loading, error, institutes} = this.props;
+
+    institutes.forEach(element => {
+      console.log(element.id);
+    });
+
     const instituteThumbnailsList = institutes.map(institute => (
       <ListItem
-        key={institute._id}
+        key={institute.id}
         style={{
           marginRight: 10,
           marginLeft: 10,
@@ -97,9 +103,12 @@ class QueryIsEmpty extends Component {
         }>
         <Thumbnail
           square
-          source={{uri: SERVER_URL + 'files/' + institute.image}}
+          source={
+            getInstituteLogo[institute.id] ||
+            require('../assets/images/institute.jpg')
+          }
         />
-        <Text style={{flex: 1, marginLeft: 15}}>{institute.name}</Text>
+        <Text style={{flex: 1, marginLeft: 15}}>{institute.text}</Text>
       </ListItem>
     ));
 
@@ -110,6 +119,7 @@ class QueryIsEmpty extends Component {
             <ScrollView
               refreshControl={
                 <RefreshControl
+                  size={RefreshControl.SIZE.LARGE}
                   refreshing={loading}
                   onRefresh={this.onRefresh}
                 />

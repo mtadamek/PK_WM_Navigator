@@ -10,6 +10,8 @@ import store from './store';
 import Map from './screens/Map';
 import Search from './screens/Search';
 import Employees from './screens/Employees';
+import Floor from './screens/Floor';
+
 import Colors from './constants/Colors';
 
 const Stack = createStackNavigator();
@@ -88,6 +90,13 @@ const init = () => (
             name="Employees"
             options={{headerTitle: 'Pracownicy'}}
             component={Employees}
+          />
+          <Stack.Screen
+            name="Floor"
+            options={{
+              headerShown: false,
+            }}
+            component={Floor}
           />
         </Stack.Navigator>
       </NavigationContainer>

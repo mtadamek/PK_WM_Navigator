@@ -1,0 +1,15 @@
+export default {
+  'ou=Administracja Wydziału Mechanicznego (M-00),ou=Wydział Mechaniczny (M),ou=Wydzialy (W),o=Politechnika Krakowska (PK),dc=pk,dc=pl': null,
+  'ou=Instytut Mechaniki Stosowanej (M-01),ou=Wydział Mechaniczny (M),ou=Wydzialy (W),o=Politechnika Krakowska (PK),dc=pk,dc=pl': require('../assets/images/ims.jpg'),
+  'ou=Instytut Inżynierii Materiałowej (M-02),ou=Wydział Mechaniczny (M),ou=Wydzialy (W),o=Politechnika Krakowska (PK),dc=pk,dc=pl': null,
+  'ou=Instytut Konstrukcji Maszyn (M-03),ou=Wydział Mechaniczny (M),ou=Wydzialy (W),o=Politechnika Krakowska (PK),dc=pk,dc=pl': require('../assets/images/ikm.jpg'),
+  'ou=Instytut Pojazdów Samochodowych i Silników Spalinowych (M-04),ou=Wydział Mechaniczny (M),ou=Wydzialy (W),o=Politechnika Krakowska (PK),dc=pk,dc=pl': require('../assets/images/ipsiss.jpg'),
+  'ou=Instytut Inżynierii Cieplnej i Procesowej (M-05),ou=Wydział Mechaniczny (M),ou=Wydzialy (W),o=Politechnika Krakowska (PK),dc=pk,dc=pl': require('../assets/images/icp.jpg'),
+  'ou=Instytut Technologii Maszyn i Automatyzacji Produkcji (M-06),ou=Wydział Mechaniczny (M),ou=Wydzialy (W),o=Politechnika Krakowska (PK),dc=pk,dc=pl': require('../assets/images/itmiap.jpg'),
+  'ou=Instytut Informatyki Stosowanej (M-07),ou=Wydział Mechaniczny (M),ou=Wydzialy (W),o=Politechnika Krakowska (PK),dc=pk,dc=pl': require('../assets/images/iis.jpg'),
+  'ou=Instytut Pojazdów Szynowych (M-08),ou=Wydział Mechaniczny (M),ou=Wydzialy (W),o=Politechnika Krakowska (PK),dc=pk,dc=pl': require('../assets/images/ips.jpg'),
+  'ou=Katedra Energetyki (M-09),ou=Wydział Mechaniczny (M),ou=Wydzialy (W),o=Politechnika Krakowska (PK),dc=pk,dc=pl': null,
+  'ou=Laboratorium Metrologii Współrzędnościowej (M-10),ou=Wydział Mechaniczny (M),ou=Wydzialy (W),o=Politechnika Krakowska (PK),dc=pk,dc=pl': require('../assets/images/lmw.jpg'),
+  'ou=Laboratorium Badań Technoklimatycznych i Maszyn Roboczych (M-11),ou=Wydział Mechaniczny (M),ou=Wydzialy (W),o=Politechnika Krakowska (PK),dc=pk,dc=pl': require('../assets/images/lbtimr.jpg'),
+  'ou=Laboratorium Inżynierii Wzornictwa Przemysłowego (M-12),ou=Wydział Mechaniczny (M),ou=Wydzialy (W),o=Politechnika Krakowska (PK),dc=pk,dc=pl': require('../assets/images/liwp.png'),
+};

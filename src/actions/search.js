@@ -1,4 +1,4 @@
-import axios, {axiosEmployees} from '../utils/axios';
+import axios, {axiosPK} from '../utils/axios';
 import {
   GET_INSTITUTES_REQUEST,
   GET_INSTITUTES_SUCCESS,
@@ -11,6 +11,7 @@ import {
   GET_INSTITUTES_AND_EMPLOYEES_ERROR,
   SET_SEARCH_QUERY,
   SET_OBJECT_TO_SHOW,
+  CLEAR_EMPLOYEES,
 } from '../constants/Actions';
 
 //Async actions
@@ -43,7 +44,17 @@ import {
 export const getInstitutes = () => async dispatch => {
   try {
     dispatch(getInstitutesRequest());
-    const res = await axios().get('/api/institutes');
+
+    let data = new FormData();
+    data.append(
+      'id',
+      'ou=Wydział Mechaniczny (M),ou=Wydzialy (W),o=Politechnika Krakowska (PK),dc=pk,dc=pl',
+    );
+
+    const res = await axiosPK().post('/tree2_getdata.php', data);
+    const count = Math.ceil(res.data.count / 10);
+    console.log('data', data);
+
     dispatch(getInstitutesSuccess(res.data));
   } catch (error) {
     dispatch(getInstitutesError(error));
@@ -65,25 +76,21 @@ const getInstitutesError = error => ({
   payload: error,
 });
 
-export const getEmployees = instituteId => async dispatch => {
+export const getEmployees = (instituteId, page) => async dispatch => {
   try {
     dispatch(getEmployeesRequest());
 
     let data = new FormData();
-    data.append(
-      'ou',
-      'ou=Instytut Informatyki Stosowanej (M-07),ou=Wydział Mechaniczny (M),ou=Wydzialy (W),o=Politechnika Krakowska (PK),dc=pk,dc=pl',
-    );
-    data.append('child', '1');
-    data.append('wybor_szukaj', '1');
-    let offset = 1;
-    data.append('offset', '1');
+    data.append('ou', instituteId);
+    data.append('child', 1);
+    data.append('wybor_szukaj', 1);
+    data.append('offset', page);
 
-    const res = await axiosEmployees().post('/', data);
-    const count = Math.ceil(res.data.count / 10);
-    console.log('data', data);
+    const res = await axiosPK().post('/data.php', data);
 
-    let employees = res.data.list;
+    const {list, count} = res.data;
+    const pages = Math.ceil(count / 10);
+    //console.log('list', list);
 
     // while (count > offset) {
     //   offset++;
@@ -100,9 +107,7 @@ export const getEmployees = instituteId => async dispatch => {
     //   //console.log('next',next.data);
     //   employees = employees.concat(next.data.list);
     // }
-
-    console.log(employees);
-    dispatch(getEmployeesSuccess(employees));
+    dispatch(getEmployeesSuccess({list, pages}));
   } catch (error) {
     dispatch(getEmployeesError(error));
   }
@@ -166,4 +171,9 @@ export const setSearchQuery = text => ({
 export const setObjectToShow = obj => ({
   type: SET_OBJECT_TO_SHOW,
   payload: obj,
+});
+
+export const clearEmployees = () => ({
+  type: CLEAR_EMPLOYEES,
+  payload: null,
 });

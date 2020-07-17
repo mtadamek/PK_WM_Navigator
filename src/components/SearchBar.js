@@ -37,7 +37,7 @@ export default class SearchBar extends React.Component {
                     this.inputRef = ref;
                   }
                 }}
-                autoFocus={true}
+                autoFocus={false}
                 placeholder="Szukaj"
                 placeholderTextColor="white"
                 style={{

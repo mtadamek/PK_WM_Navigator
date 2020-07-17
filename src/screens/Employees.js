@@ -1,5 +1,10 @@
 import React, {Component} from 'react';
-import {RefreshControl, ScrollView} from 'react-native';
+import {
+  RefreshControl,
+  ScrollView,
+  FlatList,
+  ActivityIndicator,
+} from 'react-native';
 import {
   List,
   ListItem,
@@ -13,7 +18,7 @@ import {
   Image,
 } from 'native-base';
 import {connect} from 'react-redux';
-import {getEmployees, setObjectToShow} from '../actions/search';
+import {getEmployees, clearEmployees, setObjectToShow} from '../actions/search';
 import {SERVER_URL} from '../../config';
 
 /**
@@ -21,6 +26,8 @@ import {SERVER_URL} from '../../config';
  * @name Employees
  */
 export class Employees extends Component {
+  state = {page: 1, pages: null};
+
   /** Metoda zostaje wywołana kiedy komponent został zamontowany. */
   componentDidMount() {
     const {params} = this.props.route;
@@ -29,15 +36,21 @@ export class Employees extends Component {
        * Pobiera pracowników danego instytutu z serwera
        * @param {string} instituteId - Identyfikator instytutu
        */
-      this.props.getEmployees(params.instituteId);
+      this.props.getEmployees(params.instituteId, this.state.page);
     }
+  }
+
+  componentWillUnmount() {
+    this.props.clearEmployees();
   }
 
   /** Metoda wywołująca się podczas odświeżenia widoku przez użytkownika. */
   onRefresh = () => {
     const {params} = this.props.route;
-    if (params && params.instituteId)
-      this.props.getEmployees(params.instituteId);
+    if (params && params.instituteId) {
+      this.props.clearEmployees();
+      this.props.getEmployees(params.instituteId, 1);
+    }
   };
 
   /**
@@ -49,48 +62,86 @@ export class Employees extends Component {
     this.props.navigation.navigate('Map');
   };
 
+  getMore = () => {
+    const {page} = this.state;
+    const {pages} = this.props;
+    if (pages && page <= pages) {
+      const {params} = this.props.route;
+      this.setState({page: page + 1}, () =>
+        this.props.getEmployees(params.instituteId, this.state.page),
+      );
+    }
+  };
+
   /**
    * Metoda zwracająca komponenty intefejsu użytkownika.
    * @return {React.Component} any
    */
   render() {
     const {loading, error, employees} = this.props;
-    const employeeThumbnailsList = employees.map(employee => (
-      <ListItem
-        key={employee._id}
-        style={{
-          marginRight: 10,
-          marginLeft: 10,
-          marginTop: 5,
-          marginBottom: 5,
-          paddingLeft: 10,
-          borderRadius: 10,
-          backgroundColor: 'white',
-          flex: 1,
-          alignItems: 'center',
-          justifyContent: 'flex-start',
-        }}
-        onPress={() => {
-          this.props.setObjectToShow(employee);
-          this.props.navigation.navigate('Map');
-        }}>
-        <Thumbnail
-          square
-          source={{uri: SERVER_URL + 'files/' + employee.image}}
-        />
-        <Text style={{flex: 1, marginLeft: 15}}>
-          {employee.degree} {employee.forename} {employee.surname}
-        </Text>
-      </ListItem>
-    ));
+    const {page} = this.state;
+
     return (
-      <ScrollView
-        style={{backgroundColor: '#eee'}}
+      // <ScrollView
+      //   style={{backgroundColor: '#eee'}}
+      //   contentContainerStyle={{flex: 1}}
+      //   refreshControl={
+      //     <RefreshControl refreshing={loading} onRefresh={this.onRefresh} />
+      //   }>
+      //   <List
+      //     onEndReached={() => console.log('hehe')}
+      //     style={{backgroundColor: '#eee'}}>
+      //     {employeeThumbnailsList}
+      //   </List>
+      // </ScrollView>
+      <FlatList
         refreshControl={
           <RefreshControl refreshing={loading} onRefresh={this.onRefresh} />
-        }>
-        <List style={{backgroundColor: '#eee'}}>{employeeThumbnailsList}</List>
-      </ScrollView>
+        }
+        data={employees}
+        keyExtractor={(x, i) => x.dn}
+        onEndReached={() => this.getMore()}
+        onEndReachedThreshold={0.1}
+        // ListFooterComponent={() =>
+        //   loading &&
+        //   employees.length > 0 && <ActivityIndicator size="large" animating />
+        // }
+        renderItem={({item}) => (
+          <ListItem
+            key={item.dn}
+            style={{
+              marginRight: 10,
+              marginLeft: 10,
+              marginTop: 5,
+              marginBottom: 5,
+              paddingLeft: 10,
+              borderRadius: 10,
+              backgroundColor: 'white',
+              flex: 1,
+              alignItems: 'center',
+              justifyContent: 'flex-start',
+            }}
+            onPress={() => {
+              this.props.setObjectToShow(item);
+              this.props.navigation.navigate('Map');
+            }}>
+            <Thumbnail
+              square
+              source={
+                item.givenName.split('').pop() === 'a'
+                  ? require('../assets/images/woman.png')
+                  : require('../assets/images/man.png')
+              }
+            />
+            <Text style={{flex: 1, marginLeft: 15}}>
+              {item.pleduPersonDegree === '---'
+                ? ''
+                : `${item.pleduPersonDegree} `}
+              {item.givenName} {item.sn}
+            </Text>
+          </ListItem>
+        )}
+      />
     );
   }
 }
@@ -98,11 +149,14 @@ export class Employees extends Component {
 const mapStateToProps = state => ({
   loading: state.search.loading,
   employees: state.search.employees,
+  pages: state.search.pages,
   error: state.search.error,
 });
 
 const mapDispatchToProps = dispatch => ({
-  getEmployees: instituteId => dispatch(getEmployees(instituteId)),
+  getEmployees: (instituteId, page) =>
+    dispatch(getEmployees(instituteId, page)),
+  clearEmployees: () => dispatch(clearEmployees()),
   setObjectToShow: obj => dispatch(setObjectToShow(obj)),
 });
 

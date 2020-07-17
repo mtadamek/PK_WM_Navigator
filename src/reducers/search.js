@@ -10,6 +10,7 @@ import {
   GET_INSTITUTES_AND_EMPLOYEES_ERROR,
   SET_SEARCH_QUERY,
   SET_OBJECT_TO_SHOW,
+  CLEAR_EMPLOYEES,
 } from '../constants/Actions';
 
 const initialState = {
@@ -20,6 +21,7 @@ const initialState = {
   objectToShow: null,
   error: null,
   query: '',
+  pages: null,
 };
 
 export default (state = initialState, action) => {
@@ -28,13 +30,24 @@ export default (state = initialState, action) => {
     case GET_INSTITUTES_REQUEST:
       return {...state, loading: true};
     case GET_INSTITUTES_SUCCESS:
-      return {...state, institutes: payload, error: null, loading: false};
+      return {
+        ...state,
+        institutes: payload,
+        error: null,
+        loading: false,
+      };
     case GET_INSTITUTES_ERROR:
       return {...state, error: payload, loading: false};
     case GET_EMPLOYEES_REQUEST:
       return {...state, loading: true};
     case GET_EMPLOYEES_SUCCESS:
-      return {...state, employees: payload, error: null, loading: false};
+      return {
+        ...state,
+        employees: [...state.employees, ...payload.list],
+        pages: payload.pages,
+        error: null,
+        loading: false,
+      };
     case GET_EMPLOYEES_ERROR:
       return {...state, error: payload, loading: false};
     case GET_INSTITUTES_AND_EMPLOYEES_REQUEST:
@@ -47,6 +60,12 @@ export default (state = initialState, action) => {
       return {...state, query: payload};
     case SET_OBJECT_TO_SHOW:
       return {...state, objectToShow: payload};
+    case CLEAR_EMPLOYEES:
+      return {
+        ...state,
+        employees: [],
+        pages: null,
+      };
     default:
       return state;
   }

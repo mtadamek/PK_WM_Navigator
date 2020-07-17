@@ -9,14 +9,15 @@ import {
   Linking,
   Image,
   TouchableOpacity,
+  TouchableWithoutFeedback,
 } from 'react-native';
 import {
   Container,
   Icon,
-  Button,
   Text,
   H3,
   Content,
+  Button,
   Grid,
   Row,
   Col,
@@ -24,6 +25,7 @@ import {
   Fab,
   List,
   ListItem,
+  Card,
 } from 'native-base';
 import {ScrollView} from 'react-native-gesture-handler';
 import {connect as connectToStore} from 'react-redux';
@@ -45,8 +47,10 @@ import {
 import {setObjectToShow} from '../actions/search';
 import getBuildingCoordinates from '../utils/getBuildingCoordinates';
 import getBuildingStyle from '../utils/getBuildingStyle';
+import getBuildingConfig from '../utils/getBuildingConfig';
 import mapNamespaceToBuldingName from '../utils/mapNamespaceToBuldingName';
 import Colors from '../constants/Colors';
+import Animated from 'react-native-reanimated';
 
 const {
   connect,
@@ -74,7 +78,7 @@ const HEIGHT = Window.height;
  * Map
  */
 export class Map extends Component {
-  state = {active: false, activeFloor: 0};
+  state = {active: false, activeFloor: 0, clicked: null};
   eddystoneTimeouts = {};
   /**
    * Funkcja wyświetlająca alert odnośnie odmowy dostępu do lokalizacji urządzenia.
@@ -294,9 +298,9 @@ export class Map extends Component {
    */
   showBottomInfo = () => {
     const {objectToShow} = this.props;
-    const buldingName = objectToShow.office.split('')[0].toLowerCase();
+    // const buldingName = objectToShow.office.split('')[0].toLowerCase();
     this.bottomSheet.snapTo(1);
-    this.imageZoomRef.centerOn(getBuildingCoordinates[buldingName]);
+    // this.imageZoomRef.centerOn(getBuildingCoordinates[buldingName]);
   };
 
   /**
@@ -305,27 +309,9 @@ export class Map extends Component {
    */
   render() {
     const {eddystones, namespace} = this.props;
+    const {clicked} = this.state;
 
-    const activeBuildingMap = {
-      j0: (
-        <Image
-          style={{width: WIDTH, height: WIDTH * 1.2}}
-          source={require(`../assets/images/J_0.png`)}
-        />
-      ),
-      j1: (
-        <Image
-          style={{width: WIDTH, height: WIDTH * 1.2}}
-          source={require(`../assets/images/J_1.png`)}
-        />
-      ),
-    };
-
-    const activeBuilding = (
-      <TouchableOpacity
-        style={getBuildingStyle[mapNamespaceToBuldingName[namespace]]}
-      />
-    );
+    const buildingStyle = getBuildingConfig['j'].style;
 
     const eddystoneItems = eddystones.map(eddy => (
       <ListItem key={eddy.namespace + eddy.instanceId}>
@@ -410,18 +396,67 @@ export class Map extends Component {
             cropWidth={WIDTH}
             cropHeight={HEIGHT}
             imageWidth={WIDTH}
-            imageHeight={WIDTH * 1.2}
+            imageHeight={WIDTH}
             enableSwipeDown={false}
             doubleClickInterval={300}
             maxScale={3}
-            minScale={1}>
-            {activeBuildingMap[`j${this.state.activeFloor}`]}
+            minScale={1}
+            onClick={() => {
+              if (clicked) {
+                this.props.navigation.navigate('Floor', {building: clicked});
+                this.setState({clicked: null});
+              }
+            }}>
+            <Image
+              style={{width: WIDTH, height: WIDTH}}
+              source={require('../assets/images/kampus.jpg')}
+            />
+            <View
+              onStartShouldSetResponder={() => this.setState({clicked: 'a'})}
+              style={getBuildingConfig['a'].style}
+            />
+            <View
+              onStartShouldSetResponder={() => this.setState({clicked: 'b'})}
+              style={getBuildingConfig['b'].style}
+            />
+            <View
+              onStartShouldSetResponder={() => this.setState({clicked: 'c'})}
+              style={getBuildingConfig['c'].style}
+            />
+            <View
+              onStartShouldSetResponder={() => this.setState({clicked: 'd'})}
+              style={getBuildingConfig['d'].style}
+            />
+            <View
+              onStartShouldSetResponder={() => this.setState({clicked: 'e'})}
+              style={getBuildingConfig['e'].style}
+            />
+            <View
+              onStartShouldSetResponder={() => this.setState({clicked: 'f'})}
+              style={getBuildingConfig['f'].style}
+            />
+            <View
+              onStartShouldSetResponder={() => this.setState({clicked: 'g'})}
+              style={getBuildingConfig['g'].style}
+            />
+            <View
+              onStartShouldSetResponder={() => this.setState({clicked: 'h'})}
+              style={getBuildingConfig['h'].style}
+            />
+            <View
+              onStartShouldSetResponder={() => this.setState({clicked: 'j'})}
+              style={getBuildingConfig['j'].style}
+            />
+            <View
+              onStartShouldSetResponder={() => this.setState({clicked: 'k'})}
+              style={getBuildingConfig['k'].style}
+            />
+            <View
+              onStartShouldSetResponder={() => this.setState({clicked: 'l'})}
+              style={getBuildingConfig['l'].style}
+            />
           </ImageZoom>
         </Content>
-        <Floors
-          floorsCount={3}
-          onFloorPress={floor => this.setState({activeFloor: floor})}
-        />
       </Container>
     );
   }
